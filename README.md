@@ -1,7 +1,7 @@
-# boson
+# Boson
 A semantically addressed spreadsheet-like tool.
 
-## bootstrapping a dev environment
+## Bootstrapping a dev environment
 *Boson* depends on python 3. Here's a quick boostrap script for Mac OS X:
 
 ```bash
