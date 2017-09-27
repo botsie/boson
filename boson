@@ -11,6 +11,8 @@ from pprint import pprint as pp
 
 import tasks
 
+DEBUG = False
+
 class ScriptRunner(object):
     """Understands how to parse and execute boson scripts"""
 
@@ -23,20 +25,27 @@ class ScriptRunner(object):
             self.dispatch(task)
     
     def dispatch(self, task_definition):
-        try:
-            task_class = getattr(tasks, self._task_name(task_definition['task']))
-        except AttributeError as e:
-            logging.error('Invalid Task: ' +  task_definition['task'])
-            return
+        if not DEBUG:
+            try:
+                task_class = getattr(tasks, self._task_name(task_definition['task']))
+            except AttributeError as e:
+                logging.error('Invalid Task: ' +  task_definition['task'])
+                return
 
-        try:
+            try:
+                task = task_class(task_definition)
+                logging.info('EXECUTING: ' + task_definition['description'])
+                task.execute()
+            except Exception as err:
+                logging.error('Failed to execute task: ' + task_definition['description'])
+                logging.debug(str(type(err)) + ': ' + str(err.args))
+                return
+        else:
+            # Switch off exception handling to get a decent stack trace
+            task_class = getattr(tasks, self._task_name(task_definition['task']))
             task = task_class(task_definition)
             logging.info('EXECUTING: ' + task_definition['description'])
             task.execute()
-        except Exception as err:
-            logging.error('Failed to execute task: ' + task_definition['description'])
-            logging.debug(str(type(err)) + ': ' + str(err.args))
-            return
     
     def _task_name(self, name):
         parts = name.split('-')
@@ -44,8 +53,9 @@ class ScriptRunner(object):
         return ''.join(task_name)
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
-    logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+    loglevel = getattr(logging, os.getenv('BOSON_LOGLEVEL','INFO'))
+    logging.basicConfig(level=loglevel)
+    # logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
     with open(sys.argv[1], 'r') as f:
         script = yaml.load(f)

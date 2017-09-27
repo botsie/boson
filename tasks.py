@@ -50,8 +50,13 @@ class CreateList(object):
         for c in self._definition['attributes']:
             columns.append(Column(c['name'], getattr(sys.modules[__name__], c['type'].replace('-','_').capitalize())))
         columns.insert(0,Column('name', String))
-        columns.insert(0,Column('id', Integer, Sequence(self._definition['name'] + '_id_seq'), primary_key=True))
+        columns.insert(0,Column(self._primary_key_name(), Integer, Sequence(self._definition['name'] + '_id_seq'), primary_key=True))
         return columns
+
+    def _primary_key_name(self):
+        p = inflect.engine()
+        return p.singular_noun(self._definition['name']) + '_id'
+
 
 class UpdateList(object):
     """ Understands how to update a list """
@@ -81,7 +86,7 @@ class UpdateList(object):
         DB().connection.execute(s)
 
 class CreateTransaction(object):
-    """ Understands how to update a list """
+    """ Understands how to create a transaction type """
 
     def __init__(self, definition):
         self._definition = definition
@@ -104,11 +109,25 @@ class CreateTransaction(object):
                 columns.append(Column(c['name'], Integer, ForeignKey(foreign_key), nullable=False))
             else:
                 column_type = getattr(sys.modules[__name__], c['type'].replace('-','_').capitalize())
-        columns.insert(0,Column('id', Integer, Sequence(self._definition['name'] + '_id_seq'), primary_key=True))
+        columns.insert(0,Column(self._primary_key_name(), Integer, Sequence(self._definition['name'] + '_id_seq'), primary_key=True))
         return columns
-    
+
+    def _primary_key_name(self):
+        return self._definition['name'] + '_id'
+
     def _foreign_key(self, name):
         p = inflect.engine()
         t = Table(p.plural(name), self._metadata, autoload=True)
-        return t.c.id
+        return getattr(t.c, name + '_id')
 
+
+class UpdateTransaction(object):
+    """ Understands how to update a transaction """
+
+    def __init__(self, definition):
+        self._definition = definition
+        self._metadata = MetaData(bind=DB().engine)
+        self._mytable = Table(self._definition['name'], self._metadata, autoload=True)
+
+    def execute(self):
+        pass
