@@ -4,7 +4,8 @@ import yaml
 import sys
 import os
 import logging
-from sqlalchemy import create_engine, Table, Column, Integer, String, Numeric, MetaData, ForeignKey, Sequence
+import inflect
+from sqlalchemy import create_engine, Table, Column, Integer, String, Numeric, MetaData, ForeignKey, Sequence, Date
 from sqlalchemy.sql import table, column, select, update, insert
 from pprint import pprint as pp
 
@@ -39,22 +40,28 @@ class ScriptRunner(object):
             self.dispatch(task)
     
     def dispatch(self, task_definition):
-        task_class = getattr(sys.modules[__name__], (task_definition['action'] + '_action').replace('-','_').capitalize())
-        task = task_class(task_definition)
-        logging.info('EXECUTING: ' + task_definition['description'])
-        task.execute()
+        try:
+            task_class = getattr(sys.modules[__name__], (task_definition['task'] + '_task').replace('-','_').capitalize())
+        except AttributeError as e:
+            logging.error('Invalid Task: ' +  task_definition['task'])
+            return
 
+        try:
+            task = task_class(task_definition)
+            logging.info('EXECUTING: ' + task_definition['description'])
+            task.execute()
+        except Exception as err:
+            logging.error('Failed to execute task: ' + task_definition['description'])
+            logging.debug(str(type(err)) + ': ' + str(err.args))
+            return
 
-class Create_list_action():
+class Create_list_task(object):
     """ Understands how to instantiate a list """
 
     def __init__(self, definition):
         self._definition = definition
 
     def execute(self):
-        self._create()
-
-    def _create(self):
         metadata = MetaData()
         table = Table(
             self._definition['name'],
@@ -71,7 +78,7 @@ class Create_list_action():
         columns.insert(0,Column('id', Integer, Sequence(self._definition['name'] + '_id_seq'), primary_key=True))
         return columns
 
-class Update_list_action():
+class Update_list_task(object):
     """ Understands how to update a list """
 
     def __init__(self, definition):
@@ -83,7 +90,6 @@ class Update_list_action():
         for value in self._definition['values']:
             s = self._mytable.select().where(self._mytable.c.name==value['name'])
             result = DB().connection.execute(s)
-            logging.debug('returns_rows = ' + str(result.returns_rows))
             value_exists = False
             for row in result:
                 value_exists = True
@@ -98,6 +104,38 @@ class Update_list_action():
     def _insert(self, value):
         s = self._mytable.insert().values(value)
         DB().connection.execute(s)
+
+class Create_transaction_task(object):
+    """ Understands how to update a list """
+
+    def __init__(self, definition):
+        self._definition = definition
+        self._metadata = MetaData(bind=DB().engine)
+
+    def execute(self):
+        table = Table(
+            self._definition['name'],
+            self._metadata,
+            *self._columns()
+        )
+        self._metadata.create_all(DB().engine)
+
+    def _columns(self):
+        columns = list()
+        for c in self._definition['attributes']:
+            logging.debug('column = ' + c['name'])
+            if c['type'] == 'list':
+                foreign_key = self._foreign_key(c['name']) 
+                columns.append(Column(c['name'], Integer, ForeignKey(foreign_key), nullable=False))
+            else:
+                column_type = getattr(sys.modules[__name__], c['type'].replace('-','_').capitalize())
+        columns.insert(0,Column('id', Integer, Sequence(self._definition['name'] + '_id_seq'), primary_key=True))
+        return columns
+    
+    def _foreign_key(self, name):
+        p = inflect.engine()
+        t = Table(p.plural(name), self._metadata, autoload=True)
+        return t.c.id
 
 
 if __name__ == "__main__":

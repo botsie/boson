@@ -1,24 +1,24 @@
 - description: Make a list of planning items
-  action: create-list
+  task: create-list
   name: items
   attributes:
     - {name: cost, type: numeric }
 
 - description: Make a list of locations
-  action: create-list
-  name: geo
+  task: create-list
+  name: geographies
   attributes: []
 
-- description: Update list of servers
-  action: update-list
+- description: Update list of items
+  task: update-list
   name: items
   values:
     - {name: shared hosting server, cost: 7500}
     - {name: shared hosting backup server, cost: 7500}
 
 - description: Update list of locations
-  action: update-list
-  name: geo
+  task: update-list
+  name: geographies
   values:
     - {name: TX1}
     - {name: GPX}
@@ -28,3 +28,16 @@
     - {name: CN}
     - {name: C1}
 
+- description: Create a transaction type
+  task: create-transaction
+  name: inventory
+  attributes:
+    - {name: date, type: date}
+    - {name: item, type: list}
+    - {name: geography, type: list}
+    - {name: quantity, type: numeric}
+
+- description: Create a transaction type
+  task: update-transaction
+  name: inventory
+  values: []

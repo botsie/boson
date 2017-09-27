@@ -1,3 +1,4 @@
-ipython (6.2.0)
-PyYAML (3.12)
-SQLAlchemy (1.1.14)
+ipython
+PyYAML 
+SQLAlchemy
+inflect
