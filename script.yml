@@ -1,0 +1,30 @@
+- description: Make a list of planning items
+  action: create-list
+  name: items
+  attributes:
+    - {name: cost, type: numeric }
+
+- description: Make a list of locations
+  action: create-list
+  name: geo
+  attributes:
+
+- description: Update list of servers
+  action: update-list
+  name: servers
+  values:
+    - {name: shared hosting server, cost: 7500}
+    - {name: shared hosting backup server, cost: 7500}
+
+- description: Update list of locations
+  action: update-list
+  name: geo
+  values:
+    - {name: TX1}
+    - {name: GPX}
+    - {name: HK}
+    - {name: TR}
+    - {name: UK}
+    - {name: CN}
+    - {name: C1}
+
