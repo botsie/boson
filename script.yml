@@ -7,11 +7,11 @@
 - description: Make a list of locations
   action: create-list
   name: geo
-  attributes:
+  attributes: []
 
 - description: Update list of servers
   action: update-list
-  name: servers
+  name: items
   values:
     - {name: shared hosting server, cost: 7500}
     - {name: shared hosting backup server, cost: 7500}
