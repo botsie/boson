@@ -9,8 +9,11 @@ import sys
 import os
 import logging
 import inflect
-from sqlalchemy import create_engine, Table, Column, Integer, String, Numeric, MetaData, ForeignKey, Sequence, Date
+import datetime
+
+from sqlalchemy import inspect, create_engine, Table, Column, Integer, String, Numeric, MetaData, ForeignKey, Sequence, Date
 from sqlalchemy.sql import table, column, select, update, insert
+
 from pprint import pprint as pp
 
 class DB(object):
@@ -109,6 +112,8 @@ class CreateTransaction(object):
                 columns.append(Column(c['name'], Integer, ForeignKey(foreign_key), nullable=False))
             else:
                 column_type = getattr(sys.modules[__name__], c['type'].replace('-','_').capitalize())
+                columns.append(Column(c['name'], column_type))
+
         columns.insert(0,Column(self._primary_key_name(), Integer, Sequence(self._definition['name'] + '_id_seq'), primary_key=True))
         return columns
 
@@ -128,6 +133,60 @@ class UpdateTransaction(object):
         self._definition = definition
         self._metadata = MetaData(bind=DB().engine)
         self._mytable = Table(self._definition['name'], self._metadata, autoload=True)
+        self._foreign_keys = self._get_foreign_keys()
+        self._date_columns = self._get_date_columns()
 
     def execute(self):
-        pass
+        for value in self._definition['values']:
+            if self._primary_key_name() in value.keys():
+                self._update(value)
+            else:
+                self._insert(value)
+
+    def _get_date_columns(self):
+        inspector = inspect(DB().engine)
+        date_colummns = []
+        for col in inspector.get_columns(self._definition['name']):
+            if isinstance(col['type'], Date):
+                date_colummns.append(col['name'])
+        return date_colummns
+    
+    def _get_foreign_keys(self):
+        inspector = inspect(DB().engine)
+        constrained_columns = {}
+        for key in inspector.get_foreign_keys(self._definition['name']):
+            # NOTE: I assume no composite foreign keys
+            constrained_columns[key['constrained_columns'][0]] = {
+                'referred_table': key['referred_table'],
+                'referred_column': key['referred_columns'][0],
+            }
+        return constrained_columns
+
+    def _primary_key_name(self):
+        return self._definition['name'] + '_id'
+
+    def _update(self, value):
+        s = update(self._mytable).\
+            where(self._mytable.c.name == value['name']).\
+            values(value)
+        DB().connection.execute(s)
+
+    def _insert(self, value):
+        the_values = {}
+        for key, val in value.items():
+            if key in self._foreign_keys.keys():
+                referred_table_name = self._foreign_keys[key]['referred_table']
+                referred_column = self._foreign_keys[key]['referred_column']
+                referred_table = Table(referred_table_name, self._metadata, autoload=True)
+                the_values[key] = select([referred_table.c[inflect.engine().singular_noun(referred_table_name) + '_id']]).\
+                                    where(referred_table.c.name == val)
+                                    # where(self._mytable.c[key] == referred_table.c[referred_column]).\
+            elif key in self._date_columns:
+                the_values[key] = datetime.datetime.strptime(val,'%Y/%m/%d') 
+            else:
+                the_values[key] = val 
+        pp(the_values)
+        s = self._mytable.insert().values(the_values)
+        # logging.debug(str(s))
+        DB().connection.execute(s)
+

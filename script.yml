@@ -37,7 +37,11 @@
     - {name: geography, type: list}
     - {name: quantity, type: numeric}
 
-- description: Create a transaction type
+- description: Update a transaction type
   task: update-transaction
   name: inventory
-  values: []
+  values: 
+    - {date: 2007/01/01, item: shared hosting server, geography: TX1, quantity: 10}
+    - {date: 2007/01/01, item: shared hosting backup server, geography: TX1, quantity: 10}
+    - {date: 2007/01/01, item: shared hosting server, geography: GPX, quantity: 10}
+    - {date: 2007/01/01, item: shared hosting backup server, geography: GPX, quantity: 10}
