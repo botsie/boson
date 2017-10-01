@@ -1,1 +1,2 @@
-development: sqlite:///boson.db
+development: postgresql+psycopg2://postgres:postgres@localhost:5432/boson
+# development: sqlite:///boson.db

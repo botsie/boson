@@ -1,0 +1,32 @@
+- description: Make a list of team functions
+  task: create-list
+  name: functions
+  attributes: []
+
+- description: Make a list of team members
+  task: create-list
+  name: people
+  attributes:
+    - {name: function, type: list }
+    - {name: monthly_cost, type: numeric }
+
+- description: Make a list of locations
+  task: create-list
+  name: geographies
+  attributes: []
+
+- description: Make a list of team members
+  task: create-list
+  name: people
+  attributes:
+    - {name: function, type: list }
+    - {name: monthly_cost, type: numeric }
+
+- description: Make an engineering expense transaction type
+  task: create-transaction
+  name: engineering_expenses
+  attributes:
+    - {name: date, type: date}
+    - {name: person, type: list}
+    - {name: commitment, type: numeric}
+    - {name: cost, type: numeric}

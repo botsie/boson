@@ -1,5 +1,10 @@
 # Notes
 
+## Dates
+For consistency we may need a single set of dates that apply across the system. Need to decide:
+* Just use a window and do roll ups in SQL
+* Actually do it as tables
+
 ## How to do formulas
 * Perhaps use a trigger to update a column. 
 * How to handle multiple formulas in a row? Programatically generate a PL/SQL function for the trigger? 
@@ -10,4 +15,17 @@ May have to become postgresql specific
 1. Use a ROLLUP to define the rollup.
 
 ## How to do trees
-* Use a closure tabel
+* Use a closure table
+### Tree Operations thoughts
+* build a temp table
+* accumulate into that
+
+## Misc Thoughts
+* Need master detail views
+* Need models for domain objects: Lists, Transactions, Documents , Reports, etc
+* Will need to start storing metadata
+* Lua, scheme or python for scripting?
+
+## TODO
+[ ] Convert to a postgresql back end
+[ ] Use docker 

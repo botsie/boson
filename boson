@@ -11,7 +11,7 @@ from pprint import pprint as pp
 
 import tasks
 
-DEBUG = False
+DEBUG = True
 
 class ScriptRunner(object):
     """Understands how to parse and execute boson scripts"""

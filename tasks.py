@@ -53,7 +53,7 @@ class CreateList(object):
         for c in self._definition['attributes']:
             columns.append(Column(c['name'], getattr(sys.modules[__name__], c['type'].replace('-','_').capitalize())))
         columns.insert(0,Column('name', String))
-        columns.insert(0,Column(self._primary_key_name(), Integer, Sequence(self._definition['name'] + '_id_seq'), primary_key=True))
+        columns.insert(0,Column(self._primary_key_name(), Integer, primary_key=True))
         return columns
 
     def _primary_key_name(self):
@@ -114,7 +114,7 @@ class CreateTransaction(object):
                 column_type = getattr(sys.modules[__name__], c['type'].replace('-','_').capitalize())
                 columns.append(Column(c['name'], column_type))
 
-        columns.insert(0,Column(self._primary_key_name(), Integer, Sequence(self._definition['name'] + '_id_seq'), primary_key=True))
+        columns.insert(0,Column(self._primary_key_name(), Integer, primary_key=True))
         return columns
 
     def _primary_key_name(self):
