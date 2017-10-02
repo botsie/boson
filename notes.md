@@ -15,7 +15,7 @@ May have to become postgresql specific
 1. Use a ROLLUP to define the rollup.
 
 ## How to do trees
-* Use a closure table
+* Use a closure table [https://gist.github.com/desfrenes/733a83ef82b03ee701caa761951767c9]
 ### Tree Operations thoughts
 * build a temp table
 * accumulate into that
@@ -27,5 +27,5 @@ May have to become postgresql specific
 * Lua, scheme or python for scripting?
 
 ## TODO
-[ ] Convert to a postgresql back end
-[ ] Use docker 
+[X] Convert to a postgresql back end
+[X] Use docker 

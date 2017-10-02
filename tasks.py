@@ -53,13 +53,9 @@ class CreateList(object):
         for c in self._definition['attributes']:
             columns.append(Column(c['name'], getattr(sys.modules[__name__], c['type'].replace('-','_').capitalize())))
         columns.insert(0,Column('name', String))
-        columns.insert(0,Column(self._primary_key_name(), Integer, primary_key=True))
+        columns.insert(0,Column('id', Integer, primary_key=True))
+        columns.insert(0,Column('parent_id', Integer, ForeignKey(self._definition['name'] + '.id'), nullable=True))
         return columns
-
-    def _primary_key_name(self):
-        p = inflect.engine()
-        return p.singular_noun(self._definition['name']) + '_id'
-
 
 class UpdateList(object):
     """ Understands how to update a list """
@@ -87,6 +83,34 @@ class UpdateList(object):
     def _insert(self, value):
         s = self._mytable.insert().values(value)
         DB().connection.execute(s)
+
+class UpdateListHierarchy(object):
+    """Understands how to add a hierarchy to a list"""
+
+    def __init__(self, definition):
+        self._definition = definition
+        self._metadata = MetaData(bind=DB().engine)
+        self._mytable = Table(self._definition['name'], self._metadata, autoload=True)
+
+    def execute(self):
+        for list_item, list_item_chlidren in self._definition['values'].items():
+            self._set_parent(None, list_item, list_item_chlidren)
+
+    def _set_parent(self, parent_item, list_item, list_item_chlidren):
+        mytable = self._mytable
+        if parent_item is not None:
+            subselect = select([mytable.c.id]).where(mytable.c.name == parent_item)
+            s= mytable.update().\
+                       where(mytable.c.name == list_item).values(parent_id = subselect)
+            DB().connection.execute(s)
+        if list_item_chlidren is not None:
+            for new_list_item, new_list_item_children in list_item_chlidren.items():
+                self._set_parent(list_item, new_list_item, new_list_item_children)
+        return
+    
+    def _primary_key_name(self):
+        p = inflect.engine()
+        return p.singular_noun(self._definition['name']) + '_id'
 
 class CreateTransaction(object):
     """ Understands how to create a transaction type """
@@ -123,7 +147,7 @@ class CreateTransaction(object):
     def _foreign_key(self, name):
         p = inflect.engine()
         t = Table(p.plural(name), self._metadata, autoload=True)
-        return getattr(t.c, name + '_id')
+        return t.c.id
 
 
 class UpdateTransaction(object):
@@ -178,15 +202,13 @@ class UpdateTransaction(object):
                 referred_table_name = self._foreign_keys[key]['referred_table']
                 referred_column = self._foreign_keys[key]['referred_column']
                 referred_table = Table(referred_table_name, self._metadata, autoload=True)
-                the_values[key] = select([referred_table.c[inflect.engine().singular_noun(referred_table_name) + '_id']]).\
+                the_values[key] = select([referred_table.c.id]).\
                                     where(referred_table.c.name == val)
                                     # where(self._mytable.c[key] == referred_table.c[referred_column]).\
             elif key in self._date_columns:
                 the_values[key] = datetime.datetime.strptime(val,'%Y/%m/%d') 
             else:
                 the_values[key] = val 
-        pp(the_values)
         s = self._mytable.insert().values(the_values)
-        # logging.debug(str(s))
         DB().connection.execute(s)
 

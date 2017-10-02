@@ -27,6 +27,30 @@
     - {name: UK}
     - {name: CN}
     - {name: C1}
+    - {name: APAC}
+    - {name: EUR}
+    - {name: NA}
+    - {name: SA}
+    - {name: AF}
+    - {name: GLOBAL}
+
+- description: create a hierarchy
+  task: update-list-hierarchy
+  name: geographies
+  values:
+    GLOBAL:
+      APAC:
+        GPX:
+        HK:
+        CN:
+      EUR:
+        UK:
+        TR:
+      NA:
+        TX1:
+        C1:
+      SA:
+      AF:
 
 - description: Create a transaction type
   task: create-transaction
