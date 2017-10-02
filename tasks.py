@@ -53,9 +53,13 @@ class CreateList(object):
         for c in self._definition['attributes']:
             columns.append(Column(c['name'], getattr(sys.modules[__name__], c['type'].replace('-','_').capitalize())))
         columns.insert(0,Column('name', String))
-        columns.insert(0,Column('id', Integer, primary_key=True))
-        columns.insert(0,Column('parent_id', Integer, ForeignKey(self._definition['name'] + '.id'), nullable=True))
+        columns.insert(0,Column(self._primary_key_name(), Integer, primary_key=True))
+        columns.insert(0,Column('parent_id', Integer, ForeignKey(self._definition['name'] + '.' + self._primary_key_name()), nullable=True))
         return columns
+
+    def _primary_key_name(self):
+        p = inflect.engine()
+        return p.singular_noun(self._definition['name']) + '_id'
 
 class UpdateList(object):
     """ Understands how to update a list """
@@ -99,7 +103,7 @@ class UpdateListHierarchy(object):
     def _set_parent(self, parent_item, list_item, list_item_chlidren):
         mytable = self._mytable
         if parent_item is not None:
-            subselect = select([mytable.c.id]).where(mytable.c.name == parent_item)
+            subselect = select([mytable.c[self._primary_key_name()]]).where(mytable.c.name == parent_item)
             s= mytable.update().\
                        where(mytable.c.name == list_item).values(parent_id = subselect)
             DB().connection.execute(s)
@@ -147,7 +151,7 @@ class CreateTransaction(object):
     def _foreign_key(self, name):
         p = inflect.engine()
         t = Table(p.plural(name), self._metadata, autoload=True)
-        return t.c.id
+        return t.c[name + '_id']
 
 
 class UpdateTransaction(object):
@@ -202,7 +206,7 @@ class UpdateTransaction(object):
                 referred_table_name = self._foreign_keys[key]['referred_table']
                 referred_column = self._foreign_keys[key]['referred_column']
                 referred_table = Table(referred_table_name, self._metadata, autoload=True)
-                the_values[key] = select([referred_table.c.id]).\
+                the_values[key] = select([referred_table.c[referred_column]]).\
                                     where(referred_table.c.name == val)
                                     # where(self._mytable.c[key] == referred_table.c[referred_column]).\
             elif key in self._date_columns:

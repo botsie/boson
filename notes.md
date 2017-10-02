@@ -28,4 +28,5 @@ May have to become postgresql specific
 
 ## TODO
 [X] Convert to a postgresql back end
+
 [X] Use docker 
