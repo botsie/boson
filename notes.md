@@ -49,3 +49,7 @@ For consistency we may need a single set of dates that apply across the system. 
 - [ ] Write some design documentation
 - [ ] Implement formulas as views
 - [ ] Move logic from task classes to models
+- [ ] Write a print task
+- [ ] Write a CSV import task
+- [ ] Add a date range as metadata
+
