@@ -1,26 +1,55 @@
-- description: Make a list of team functions
-  task: create-list
-  name: functions
-  attributes: []
-
 - description: Make a list of team members
   task: create-list
   name: people
   attributes:
-    - {name: function, type: list }
     - {name: monthly_cost, type: numeric }
+
+- description: Make a list of servers
+  task: create-list
+  name: servers
+  attributes:
+    - {name: cost, type: numeric }
 
 - description: Make a list of locations
   task: create-list
   name: geographies
   attributes: []
 
-- description: Make a list of team members
-  task: create-list
-  name: people
-  attributes:
-    - {name: function, type: list }
-    - {name: monthly_cost, type: numeric }
+- description: Update list of locations
+  task: update-list
+  name: geographies
+  values:
+    - {name: TX1}
+    - {name: GPX}
+    - {name: HK}
+    - {name: TR}
+    - {name: UK}
+    - {name: CN}
+    - {name: C1}
+    - {name: APAC}
+    - {name: EUR}
+    - {name: NA}
+    - {name: SA}
+    - {name: AF}
+    - {name: GLOBAL}
+
+- description: create a hierarchy
+  task: update-list-hierarchy
+  name: geographies
+  values:
+    GLOBAL:
+      APAC:
+        GPX:
+        HK:
+        CN:
+      EUR:
+        UK:
+        TR:
+      NA:
+        TX1:
+        C1:
+      SA:
+      AF:
 
 - description: Make an engineering expense transaction type
   task: create-transaction
@@ -29,4 +58,33 @@
     - {name: date, type: date}
     - {name: person, type: list}
     - {name: commitment, type: numeric}
-    - {name: cost, type: numeric}
+    - {name: cost, type: formula, formula: person.monthly_cost * commitment } # this needs to be a formula
+
+- description: Make an revenue transaction type
+  task: create-transaction
+  name: revenue
+  attributes:
+    - {name: date, type: date}
+    - {name: geography, type: list}
+    - {name: amount, type: numeric}
+
+- description: Make a list of account types
+  task: create-list
+  name: account_types
+  attributes: []
+
+- description: Update list of account types
+  task: update-list
+  name: account_types
+  values:
+    - {name: revenue}
+    - {name: expense}
+    - {name: asset}
+    - {name: liability}
+
+- description: Make a list of accounts
+  task: create-list
+  name: accounts
+  attributes: 
+    - {name: account_type, type: list}
+
