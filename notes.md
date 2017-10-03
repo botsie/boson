@@ -6,8 +6,8 @@ For consistency we may need a single set of dates that apply across the system. 
 * Actually do it as tables
 
 ## How to do formulas
-* Perhaps use a trigger to update a column. 
-* How to handle multiple formulas in a row? Programatically generate a PL/SQL function for the trigger? 
+* ~~Perhaps use a trigger to update a column.~~
+* ~~How to handle multiple formulas in a row? Programatically generate a PL/SQL function for the trigger?~~
 
 ## How to do rollups.
 May have to become postgresql specific
@@ -28,6 +28,6 @@ May have to become postgresql specific
 * Use [postman](https://www.getpostman.com/postman) for API development.
 
 ## TODO
-[X] Convert to a postgresql back end
-
-[X] Use docker 
+- [X] Convert to a postgresql back end
+- [X] Use docker for postgres
+- [ ] Implement formulas as views
