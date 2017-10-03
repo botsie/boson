@@ -26,8 +26,8 @@ class CreateList(object):
         self._definition = definition
 
     def execute(self):
-        new_list = boson.models.list.List(self._definition)
-        new_list.create()
+        the_list = boson.models.list.List(self._definition)
+        the_list.create()
 
 
 class UpdateList(object):
@@ -35,27 +35,11 @@ class UpdateList(object):
 
     def __init__(self, definition):
         self._definition = definition
-        self._metadata = MetaData(bind=DB().engine)
-        self._mytable = Table(self._definition['name'], self._metadata, autoload=True)
 
     def execute(self):
-        for value in self._definition['values']:
-            s = self._mytable.select().where(self._mytable.c.name==value['name'])
-            result = DB().connection.execute(s)
-            value_exists = False
-            for row in result:
-                value_exists = True
-            self._update(value) if value_exists else self._insert(value)
+        the_list = boson.models.list.List(self._definition)
+        the_list.populate()
 
-    def _update(self, value):
-        s = update(self._mytable).\
-            where(self._mytable.c.name == value['name']).\
-            values(value)
-        DB().connection.execute(s)
-
-    def _insert(self, value):
-        s = self._mytable.insert().values(value)
-        DB().connection.execute(s)
 
 class UpdateListHierarchy(object):
     """Understands how to add a hierarchy to a list"""
