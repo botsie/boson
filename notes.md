@@ -15,7 +15,7 @@ May have to become postgresql specific
 1. Use a ROLLUP to define the rollup.
 
 ## How to do trees
-* Use a closure table [https://gist.github.com/desfrenes/733a83ef82b03ee701caa761951767c9]
+* Use a [closure table](https://gist.github.com/desfrenes/733a83ef82b03ee701caa761951767c9)
 ### Tree Operations thoughts
 * build a temp table
 * accumulate into that
@@ -25,7 +25,7 @@ May have to become postgresql specific
 * Need models for domain objects: Lists, Transactions, Documents , Reports, etc
 * Will need to start storing metadata
 * Lua, scheme or python for scripting?
-* Use postman [https://www.getpostman.com/postman:postman] for API development.
+* Use [postman](https://www.getpostman.com/postman) for API development.
 
 ## TODO
 [X] Convert to a postgresql back end
