@@ -10,13 +10,14 @@ import os
 import logging
 import inflect
 import datetime
+from pprint import pprint as pp
 
 from sqlalchemy import inspect, create_engine, Table, Column, Integer, String, Numeric, MetaData, ForeignKey, Sequence, Date
 from sqlalchemy.sql import table, column, select, update, insert
 
-from pprint import pprint as pp
 
 from boson.database import DB
+import boson.models.list
 
 class CreateList(object):
     """ Understands how to instantiate a list """
@@ -25,26 +26,9 @@ class CreateList(object):
         self._definition = definition
 
     def execute(self):
-        metadata = MetaData()
-        table = Table(
-            self._definition['name'],
-            metadata,
-            *self._columns()
-        )
-        metadata.create_all(DB().engine)
+        new_list = boson.models.list.List(self._definition)
+        new_list.create()
 
-    def _columns(self):
-        columns = list()
-        for c in self._definition['attributes']:
-            columns.append(Column(c['name'], getattr(sys.modules[__name__], c['type'].replace('-','_').capitalize())))
-        columns.insert(0,Column('name', String))
-        columns.insert(0,Column(self._primary_key_name(), Integer, primary_key=True))
-        columns.insert(0,Column('parent_id', Integer, ForeignKey(self._definition['name'] + '.' + self._primary_key_name()), nullable=True))
-        return columns
-
-    def _primary_key_name(self):
-        p = inflect.engine()
-        return p.singular_noun(self._definition['name']) + '_id'
 
 class UpdateList(object):
     """ Understands how to update a list """
