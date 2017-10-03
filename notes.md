@@ -25,6 +25,7 @@ May have to become postgresql specific
 * Need models for domain objects: Lists, Transactions, Documents , Reports, etc
 * Will need to start storing metadata
 * Lua, scheme or python for scripting?
+* Use postman [https://www.getpostman.com/postman:postman] for API development.
 
 ## TODO
 [X] Convert to a postgresql back end
