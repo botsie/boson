@@ -12,7 +12,7 @@ import inflect
 import datetime
 from pprint import pprint as pp
 
-from sqlalchemy import inspect, create_engine, Table, Column, Integer, String, Numeric, MetaData, ForeignKey, Sequence, Date
+from sqlalchemy import inspect, create_engine, Table, Column, Integer, String, Numeric, MetaData, ForeignKey, Sequence, Date, text
 from sqlalchemy.sql import table, column, select, update, insert
 
 
@@ -26,7 +26,9 @@ class DropAll(object):
         self._definition = definition
 
     def execute(self):
-        MetaData(bind=DB().engine, reflect=True).drop_all()
+        meta = MetaData(bind=DB().engine, reflect=True)
+        for table in reversed(meta.sorted_tables):
+            DB().engine.execute(f"DROP TABLE {table.name} CASCADE")
     
 
 class CreateList(object):
@@ -96,7 +98,7 @@ class CreateTransaction(object):
 
     def _foreign_key(self, name):
         p = inflect.engine()
-        t = Table(p.plural(name), self._metadata, autoload=True)
+        t = Table(p.plural(name) + '_table', self._metadata, autoload=True)
         return t.c[name + '_id']
 
 
