@@ -19,6 +19,16 @@ from sqlalchemy.sql import table, column, select, update, insert
 from boson.database import DB
 import boson.models.list
 
+class DropAll(object):
+    """Drops all tables in the database"""
+
+    def __init__(self, definition):
+        self._definition = definition
+
+    def execute(self):
+        MetaData(bind=DB().engine, reflect=True).drop_all()
+    
+
 class CreateList(object):
     """ Understands how to instantiate a list """
 

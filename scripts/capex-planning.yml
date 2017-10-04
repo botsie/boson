@@ -1,3 +1,6 @@
+- description: Drop all tables
+  task: drop-all
+
 - description: Make a list of planning items
   task: create-list
   name: items
