@@ -35,6 +35,7 @@ For consistency we may need a single set of dates that apply across the system. 
 ### Tree Operations thoughts
 * build a temp table
 * accumulate into that
+* Build a bottom up traversal and top down traveral methods that accept parameterized formulas.
 
 ## Misc Thoughts
 * Need master detail views
