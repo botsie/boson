@@ -46,28 +46,11 @@ class UpdateListHierarchy(object):
 
     def __init__(self, definition):
         self._definition = definition
-        self._metadata = MetaData(bind=DB().engine)
-        self._mytable = Table(self._definition['name'], self._metadata, autoload=True)
 
     def execute(self):
-        for list_item, list_item_chlidren in self._definition['values'].items():
-            self._set_parent(None, list_item, list_item_chlidren)
+        the_list = boson.models.list.List(self._definition)
+        the_list.hierarchy() # TODO: Pass the hierarchy as a parameter
 
-    def _set_parent(self, parent_item, list_item, list_item_chlidren):
-        mytable = self._mytable
-        if parent_item is not None:
-            subselect = select([mytable.c[self._primary_key_name()]]).where(mytable.c.name == parent_item)
-            s= mytable.update().\
-                       where(mytable.c.name == list_item).values(parent_id = subselect)
-            DB().connection.execute(s)
-        if list_item_chlidren is not None:
-            for new_list_item, new_list_item_children in list_item_chlidren.items():
-                self._set_parent(list_item, new_list_item, new_list_item_children)
-        return
-    
-    def _primary_key_name(self):
-        p = inflect.engine()
-        return p.singular_noun(self._definition['name']) + '_id'
 
 class CreateTransaction(object):
     """ Understands how to create a transaction type """

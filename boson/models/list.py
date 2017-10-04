@@ -37,6 +37,23 @@ class List(object):
                 value_exists = True
             self._update(value) if value_exists else self._insert(value)
 
+    def hierarchy(self):
+        self._mytable = Table(self._definition['name'], self._metadata, autoload=True)
+        for list_item, list_item_children in self._definition['values'].items():
+            self._set_parent(None, list_item, list_item_children)
+
+    def _set_parent(self, parent_item, list_item, list_item_chlidren):
+        mytable = self._mytable
+        if parent_item is not None:
+            subselect = select([mytable.c[self._primary_key_name()]]).where(mytable.c.name == parent_item)
+            s= mytable.update().\
+                       where(mytable.c.name == list_item).values(parent_id = subselect)
+            DB().connection.execute(s)
+        if list_item_chlidren is not None:
+            for new_list_item, new_list_item_children in list_item_chlidren.items():
+                self._set_parent(list_item, new_list_item, new_list_item_children)
+        return
+
     def _update(self, value):
         s = update(self._mytable).\
             where(self._mytable.c.name == value['name']).\
