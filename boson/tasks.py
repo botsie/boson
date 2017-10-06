@@ -19,6 +19,7 @@ from sqlalchemy.sql import table, column, select, update, insert
 from boson.database import DB
 import boson.models.list
 
+
 class DropAll(object):
     """Drops all tables in the database"""
 
@@ -29,7 +30,7 @@ class DropAll(object):
         meta = MetaData(bind=DB().engine, reflect=True)
         for table in reversed(meta.sorted_tables):
             DB().engine.execute(f"DROP TABLE {table.name} CASCADE")
-    
+
 
 class CreateList(object):
     """ Understands how to instantiate a list """
@@ -61,7 +62,7 @@ class UpdateListHierarchy(object):
 
     def execute(self):
         the_list = boson.models.list.List(self._definition)
-        the_list.hierarchy() # TODO: Pass the hierarchy as a parameter
+        the_list.hierarchy()  # TODO: Pass the hierarchy as a parameter
 
 
 class CreateTransaction(object):
@@ -84,13 +85,16 @@ class CreateTransaction(object):
         for c in self._definition['attributes']:
             logging.debug('column = ' + c['name'])
             if c['type'] == 'list':
-                foreign_key = self._foreign_key(c['name']) 
-                columns.append(Column(c['name'], Integer, ForeignKey(foreign_key), nullable=False))
+                foreign_key = self._foreign_key(c['name'])
+                columns.append(
+                    Column(c['name'], Integer, ForeignKey(foreign_key), nullable=False))
             else:
-                column_type = getattr(sys.modules[__name__], c['type'].replace('-','_').capitalize())
+                column_type = getattr(
+                    sys.modules[__name__], c['type'].replace('-', '_').capitalize())
                 columns.append(Column(c['name'], column_type))
 
-        columns.insert(0,Column(self._primary_key_name(), Integer, primary_key=True))
+        columns.insert(0, Column(self._primary_key_name(),
+                                 Integer, primary_key=True))
         return columns
 
     def _primary_key_name(self):
@@ -108,7 +112,8 @@ class UpdateTransaction(object):
     def __init__(self, definition):
         self._definition = definition
         self._metadata = MetaData(bind=DB().engine)
-        self._mytable = Table(self._definition['name'], self._metadata, autoload=True)
+        self._mytable = Table(
+            self._definition['name'], self._metadata, autoload=True)
         self._foreign_keys = self._get_foreign_keys()
         self._date_columns = self._get_date_columns()
 
@@ -121,12 +126,12 @@ class UpdateTransaction(object):
 
     def _get_date_columns(self):
         inspector = inspect(DB().engine)
-        date_colummns = []
+        date_columns = []
         for col in inspector.get_columns(self._definition['name']):
             if isinstance(col['type'], Date):
-                date_colummns.append(col['name'])
-        return date_colummns
-    
+                date_columns.append(col['name'])
+        return date_columns
+
     def _get_foreign_keys(self):
         inspector = inspect(DB().engine)
         constrained_columns = {}
@@ -153,14 +158,14 @@ class UpdateTransaction(object):
             if key in self._foreign_keys.keys():
                 referred_table_name = self._foreign_keys[key]['referred_table']
                 referred_column = self._foreign_keys[key]['referred_column']
-                referred_table = Table(referred_table_name, self._metadata, autoload=True)
+                referred_table = Table(
+                    referred_table_name, self._metadata, autoload=True)
                 the_values[key] = select([referred_table.c[referred_column]]).\
-                                    where(referred_table.c.name == val)
-                                    # where(self._mytable.c[key] == referred_table.c[referred_column]).\
+                    where(referred_table.c.name == val)
+                # where(self._mytable.c[key] == referred_table.c[referred_column]).\
             elif key in self._date_columns:
-                the_values[key] = datetime.datetime.strptime(val,'%Y/%m/%d') 
+                the_values[key] = datetime.datetime.strptime(val, '%Y/%m/%d')
             else:
-                the_values[key] = val 
+                the_values[key] = val
         s = self._mytable.insert().values(the_values)
         DB().connection.execute(s)
-
