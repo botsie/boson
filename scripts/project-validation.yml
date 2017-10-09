@@ -1,3 +1,6 @@
+- description: Drop all tables
+  task: drop-all
+
 - description: Make a list of team members
   task: create-list
   name: people
@@ -58,7 +61,7 @@
     - {name: date, type: date}
     - {name: person, type: list}
     - {name: commitment, type: numeric}
-    - {name: cost, type: formula, formula: person.monthly_cost * commitment } # this needs to be a formula
+    # - {name: cost, type: formula, formula: person.monthly_cost * commitment } # this needs to be a formula
 
 - description: Make an revenue transaction type
   task: create-transaction
