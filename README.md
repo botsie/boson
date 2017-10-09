@@ -1,4 +1,4 @@
-# Boson
+# Boson (neo4j)
 A semantically addressed spreadsheet-like tool.
 
 ## Bootstrapping a dev environment
