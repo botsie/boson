@@ -24,3 +24,13 @@ class DB(object):
             DB.__instance.session = DB.__instance.driver.session()
 
         return DB.__instance
+
+    @property
+    def lists(self):
+        results = self.session.run(
+            "MATCH (n:list) WITH DISTINCT labels(n) AS labels UNWIND labels as label RETURN DISTINCT label ORDER BY label"
+        )
+        labels = []
+        for r in results:
+            labels.append(r['label'])
+        return labels
