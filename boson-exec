@@ -6,13 +6,11 @@ import logging
 from pprint import pprint as pp
 
 import yaml
-import inflect
-from sqlalchemy import create_engine, Table, Column, Integer, String, Numeric, MetaData, ForeignKey, Sequence, Date
-from sqlalchemy.sql import table, column, select, update, insert
 
-import boson.tasks as tasks 
+import boson.tasks as tasks
 
 DEBUG = True
+
 
 class ScriptRunner(object):
     """Understands how to parse and execute boson scripts"""
@@ -24,13 +22,14 @@ class ScriptRunner(object):
         # TODO: validate script syntax
         for task in script:
             self.dispatch(task)
-    
+
     def dispatch(self, task_definition):
         if not DEBUG:
             try:
-                task_class = getattr(tasks, self._task_name(task_definition['task']))
+                task_class = getattr(
+                    tasks, self._task_name(task_definition['task']))
             except AttributeError as e:
-                logging.error('Invalid Task: ' +  task_definition['task'])
+                logging.error('Invalid Task: ' + task_definition['task'])
                 return
 
             try:
@@ -38,23 +37,26 @@ class ScriptRunner(object):
                 logging.info('EXECUTING: ' + task_definition['description'])
                 task.execute()
             except Exception as err:
-                logging.error('Failed to execute task: ' + task_definition['description'])
+                logging.error('Failed to execute task: ' +
+                              task_definition['description'])
                 logging.debug(str(type(err)) + ': ' + str(err.args))
                 return
         else:
             # Switch off exception handling to get a decent stack trace
-            task_class = getattr(tasks, self._task_name(task_definition['task']))
+            task_class = getattr(
+                tasks, self._task_name(task_definition['task']))
             task = task_class(task_definition)
             logging.info('EXECUTING: ' + task_definition['description'])
             task.execute()
-    
+
     def _task_name(self, name):
         parts = name.split('-')
         task_name = [s.capitalize() for s in parts]
         return ''.join(task_name)
 
+
 if __name__ == "__main__":
-    loglevel = getattr(logging, os.getenv('BOSON_LOGLEVEL','INFO'))
+    loglevel = getattr(logging, os.getenv('BOSON_LOGLEVEL', 'INFO'))
     logging.basicConfig(level=loglevel)
     # logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 

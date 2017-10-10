@@ -1,5 +1,4 @@
 ipython
 PyYAML 
-SQLAlchemy
 inflect
-psycopg2
+neo4j-driver

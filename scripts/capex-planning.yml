@@ -1,5 +1,5 @@
-- description: Drop all tables
-  task: drop-all
+# - description: Drop all tables
+#   task: drop-all
 
 - description: Make a list of planning items
   task: create-list
@@ -37,38 +37,38 @@
     - {name: AF}
     - {name: GLOBAL}
 
-- description: create a hierarchy
-  task: update-list-hierarchy
-  name: geographies
-  values:
-    GLOBAL:
-      APAC:
-        GPX:
-        HK:
-        CN:
-      EUR:
-        UK:
-        TR:
-      NA:
-        TX1:
-        C1:
-      SA:
-      AF:
+# - description: create a hierarchy
+#   task: update-list-hierarchy
+#   name: geographies
+#   values:
+#     GLOBAL:
+#       APAC:
+#         GPX:
+#         HK:
+#         CN:
+#       EUR:
+#         UK:
+#         TR:
+#       NA:
+#         TX1:
+#         C1:
+#       SA:
+#       AF:
 
-- description: Create a transaction type
-  task: create-transaction
-  name: inventory
-  attributes:
-    - {name: date, type: date}
-    - {name: item, type: list}
-    - {name: geography, type: list}
-    - {name: quantity, type: numeric}
+# - description: Create a transaction type
+#   task: create-transaction
+#   name: inventory
+#   attributes:
+#     - {name: date, type: date}
+#     - {name: item, type: list}
+#     - {name: geography, type: list}
+#     - {name: quantity, type: numeric}
 
-- description: Update a transaction type
-  task: update-transaction
-  name: inventory
-  values: 
-    - {date: 2007/01/01, item: shared hosting server, geography: TX1, quantity: 10}
-    - {date: 2007/01/01, item: shared hosting backup server, geography: TX1, quantity: 10}
-    - {date: 2007/01/01, item: shared hosting server, geography: GPX, quantity: 10}
-    - {date: 2007/01/01, item: shared hosting backup server, geography: GPX, quantity: 10}
+# - description: Update a transaction type
+#   task: update-transaction
+#   name: inventory
+#   values: 
+#     - {date: 2007/01/01, item: shared hosting server, geography: TX1, quantity: 10}
+#     - {date: 2007/01/01, item: shared hosting backup server, geography: TX1, quantity: 10}
+#     - {date: 2007/01/01, item: shared hosting server, geography: GPX, quantity: 10}
+#     - {date: 2007/01/01, item: shared hosting backup server, geography: GPX, quantity: 10}

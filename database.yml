@@ -1,2 +1,4 @@
-development: postgresql+psycopg2://postgres:postgres@localhost:5432/boson
-# development: sqlite:///boson.db
+development: 
+  uri: bolt://localhost:7687
+  user: neo4j
+  password: password
