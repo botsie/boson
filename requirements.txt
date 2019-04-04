@@ -2,3 +2,5 @@ ipython
 PyYAML 
 inflect
 neo4j-driver
+pandas
+requests

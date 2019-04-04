@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from boson.database import DB
-from boson.models.sql_table import SQLTable
+# from boson.models.sql_table import SQLTable
 
 from pprint import pprint as pp
 
@@ -22,6 +22,7 @@ class GraphNodeType(object):
         for value in self.values:
             self._add_node(tx, value)
         DB().session.commit_transaction()
+
         tx = DB().session.begin_transaction()
         for value in self.values:
             self._add_relationships(tx, value)
@@ -30,7 +31,7 @@ class GraphNodeType(object):
     def hierarchy(self):
         tx = DB().session.begin_transaction()
         for list_item, list_item_children in self.values.items():
-            self._set_parent(tx, None, list_item, list_item_children)
+            self._set_parent(tx, "", None, list_item, list_item_children)
         DB().session.commit_transaction()
 
     @property
@@ -55,13 +56,10 @@ class GraphNodeType(object):
                     f"      (b:{key}:list {{name: ${key}}})",
                     f"MERGE (a)-[:REFERENCES]->(b)"
                 ))
-                # pp(value)
-                pp(cypher)
-                pp(key)
                 tx.run(cypher, {key: value})
-                # pp(value)
 
-    def _set_parent(self, tx, parent, item, children):
+    def _set_parent(self, tx, ancestors, parent, item, children):
+        path = ancestors + ':' + item
         if parent is not None:
             cypher = ' '.join((
                 f"MATCH (item{self.labels} {{name: $item_name}}),",
@@ -69,9 +67,17 @@ class GraphNodeType(object):
                 f"MERGE (item)-[:CHILD_OF]->(parent)"
             ))
             tx.run(cypher, item_name=item, parent_name=parent)
+
+        cypher = ' '.join((
+            f"MATCH (item{self.labels} {{name: $item_name}})",
+            f"SET item.path = $path"
+        ))
+        tx.run(cypher, item_name=item, path=path)
+
         if children is not None:
             for new_item, new_item_children in children.items():
-                self._set_parent(tx, item, new_item, new_item_children)
+                self._set_parent(tx, path, item,
+                                 new_item, new_item_children)
         return
 
 

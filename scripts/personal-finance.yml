@@ -1,0 +1,63 @@
+- description: Drop all nodes and edges
+  task: drop-all
+
+- description: Make a list of accounts
+  task: create-list
+  name: account
+  attributes: []
+
+- description: Update the list of accounts
+  task: update-list
+  name: account
+  values:
+    - {name: Income}
+    - {name: Expenses}
+    - {name: Assets}
+    - {name: Liabilities}
+    - {name: Salary}
+    - {name: Rent}
+    - {name: Food}
+    - {name: Car}
+    - {name: Fuel}
+    - {name: Maintenance}
+    - {name: BankAccount}
+    - {name: Cash}
+    - {name: CarLoan}
+
+- description: create a hierarchy of accounts
+  task: update-list-hierarchy
+  name: account
+  values:
+    Income:
+      Salary:
+    Expenses:
+      Rent:
+      Food:
+      Car:
+        Fuel:
+        Maintenance:
+    Assets:
+      BankAccount:
+      Cash:
+    Liabilities:
+      CarLoan:
+
+- description: Update a transaction type
+  task: update-transaction
+  name: journal
+  values: 
+    - {date: 2018/01/01, account: Salary, amount: -100000}
+    - {date: 2018/01/01, account: BankAccount, amount: 100000}
+    - {date: 2018/01/02, account: BankAccount, amount: -100}
+    - {date: 2018/01/02, account: Rent, amount: 100}
+    - {date: 2018/01/02, account: BankAccount, amount: -10}
+    - {date: 2018/01/02, account: Food, amount: 10}
+    - {date: 2018/01/02, account: BankAccount, amount: -10000}
+    - {date: 2018/01/02, account: Cash, amount: 10000}
+
+
+
+
+
+
+

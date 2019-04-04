@@ -1,34 +1,19 @@
 # Notes
 
 ## Dates
-For consistency we may need a single set of dates that apply across the system. Need to decide:
-* Just use a window and do roll ups in SQL
-* Actually do it as tables
+* neo4j dates plugin
 
 ## How to do formulas
-* ~~Perhaps use a trigger to update a column.~~
-* ~~How to handle multiple formulas in a row? Programatically generate a PL/SQL function for the trigger?~~
-* Use views
+* save in metadata
+* calculate when reporting
 
 ## How to to do rules
-* 'Rules' are procedures that happen in response to events like:
-  * A table update
-  * A cron execution
-  * User trigger
-* Need to validate whether they are really required. I want to avoid coding as much as possible. It might be sufficient to have formulas and rollups.
-* May need to embed a scripting language:
-  * Python
-  * Lua
-  * Scheme
-* Python might be the easiest to do.
-  
+* ??
 
 ## How to do rollups.
-* May have to become postgresql specific
-* Build a pivot using a crosstab query perhaps as a view
-  * But crosstabs require you to know the pivot headers in advance. :worried:
-* Use a ROLLUP to define the rollup.
-* Or we may have to do it in python and take the performance hit.
+* sum up the hierarchy
+
+
 
 ## How to do trees
 * Use a [closure table](https://gist.github.com/desfrenes/733a83ef82b03ee701caa761951767c9)

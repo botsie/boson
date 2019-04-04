@@ -1,0 +1,17 @@
+--- 3.2.5/Dockerfile	2017-10-13 18:19:01.000000000 +0530
++++ Dockerfile.modified	2017-10-13 18:18:01.000000000 +0530
+@@ -17,11 +17,13 @@
+     && rm ${NEO4J_TARBALL} \
+     && mv /var/lib/neo4j/data /data \
+     && ln -s /data /var/lib/neo4j/data \
++    && ln -s /plugins /var/lib/neo4j/plugins \
++    && ln -s /logs /var/lib/neo4j/logs \
+     && apk del curl
+ 
+ WORKDIR /var/lib/neo4j
+ 
+-VOLUME /data
++VOLUME /data /logs /plugins
+ 
+ COPY docker-entrypoint.sh /docker-entrypoint.sh
+ 
